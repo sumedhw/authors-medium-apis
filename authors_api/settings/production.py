@@ -8,7 +8,7 @@ CSRF_TRUSTED_ORIGINS = ["https://trainingwebdev.com"]
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["trainingwebdev.com"])
+# ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["trainingwebdev.com"])
 
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
