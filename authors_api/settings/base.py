@@ -1,9 +1,11 @@
 from datetime import timedelta
 from pathlib import Path
+import sys
 
 import environ
 
 env = environ.Env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -93,14 +95,16 @@ WSGI_APPLICATION = "authors_api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": "db.sqlite3",
+#     }
+# }
 
+DATABASES = {"default": env.db("DATABASE_URL")}
 # DATABASES = {"default": env.db("DATABASE_URL")}
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -171,6 +175,7 @@ STORAGES = {
     },
 }
 
+AUTH_USER_MODEL = "users.User"
 
 LOGGING = {
     "version": 1,
