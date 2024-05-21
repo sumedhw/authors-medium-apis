@@ -1,9 +1,11 @@
 from datetime import timedelta
 from pathlib import Path
+import sys
 
 import environ
 
 env = environ.Env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -95,14 +97,16 @@ WSGI_APPLICATION = "authors_api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": "db.sqlite3",
+#     }
+# }
 
+DATABASES = {"default": env.db("DATABASE_URL")}
 # DATABASES = {"default": env.db("DATABASE_URL")}
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -172,6 +176,62 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+AUTH_USER_MODEL = "users.User"
+
+CELERY_BROKER_URL = env("CELERY_BROKER")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_RESULT_BACKEND_MAX_RETRIES = 10
+CELERY_TASK_SEND_SENT_EVENT = True
+
+if USE_TZ:
+    CELERY_TIMEZONE = TIME_ZONE
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "SIGNING_KEY": env("SIGNING_KEY"),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+}
+
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "authors-access-token",
+    "JWT_AUTH_REFRESH_COOKIE": "authors-refresh-token",
+    "REGISTER_SERIALIZER": "core_apps.users.serializers.CustomRegisterSerializer",
+}
+
+AUTHENTICATION_BACKENDS = [
+    "allauth.account.auth_backends.AuthenticationBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
 
 
 LOGGING = {
