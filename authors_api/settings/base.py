@@ -51,6 +51,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [ "core_apps.profiles",
     "core_apps.common",
     "core_apps.users",
+    "core.apps.articles",
+    "core_apps.ratings"
     ]
 
 # Application definition
